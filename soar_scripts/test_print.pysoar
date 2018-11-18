@@ -1,0 +1,6 @@
+
+def run(data={}, settings={}):
+
+    print("Running {}".format(settings["name"]))
+    return data
+

@@ -2,6 +2,7 @@ class Task():
 
     def __init__(self, settings={}):
 
+        self._type = "task"
         self._settings = self._validate_settings(settings)
 
         with open("./soar_scripts/"+self._settings["script"], "r") as f:
@@ -16,7 +17,6 @@ class Task():
                 raise ValueError("{} not in task settings".format(req))
 
         return settings
-
 
     def execute(self, data={}):
         for imp in self._settings["imports"]:

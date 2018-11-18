@@ -4,7 +4,6 @@ def run(data={}, settings={}):
     print("Running {} on {}".format(settings["name"],
                                     settings["url"]))
     r = requests.get(settings["url"])
-    data[settings["id"] + ".data"] = r.text
     data[settings["id"] + ".status_code"] = r.status_code
     return data
 

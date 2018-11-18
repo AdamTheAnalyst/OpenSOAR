@@ -1,49 +1,51 @@
 #!/usr/bin/python
 
+import yaml
+import sys
+
 from task import Task
 from decision import Decision
 
+
 class PlayBook():
 
+    def __init__(self, playbook_path):
 
-    def start(self):
+        with open(playbook_path, "r") as f:
+            self._pb = yaml.load(f.read())
 
-        task1 = Task(settings={
-            "id": "get_url",
-            "name": "Get URL",
-            "script": "request_file.pysoar",
-            "entry_point": "run",
-            "imports": ["requests"],
-            "url": "https://www.test.com",
-        })
+        self._step = self._pb["starttaskid"]
+        self._tasks = {}
 
+        for task_id in self._pb["tasks"]:
 
-        task2 = Task(settings={
-            "id": "get_url_bing",
-            "name": "Get URL Bing",
-            "script": "request_file.pysoar",
-            "entry_point": "run",
-            "imports": ["requests"],
-            "url": "https://www.bing.com",
-        })
+            task_settings = self._pb["tasks"][task_id]["task"]
+            if self._pb["tasks"][task_id]["type"] == "task":
+                self._tasks[task_id] = Task(settings=task_settings)
 
-        dec1 = Decision(settings={
-            "id": "bing_or_test",
-            "name": "Bing Or Test",
-            "condition": "==",
-            "left_operand": "query.site",
-            "left_operand_dynamic": True,
-            "right_operand": "bing",
-            "right_operand_dynamic": False,
-            "if_false": task1.execute,
-            "if_true": task2.execute
-        })
+            elif self._pb["tasks"][task_id]["type"] == "condition":
+                self._tasks[task_id] = Decision(settings=task_settings)
 
-        dec1.execute(data={"query.site": "bing"})
+    def start(self, data={}):
+
+        c_step = self._step
+
+        while c_step:
+            active = self._tasks[c_step]
+
+            if active._type == "task":
+                data = active.execute(data=data)
+                c_step = self._pb["tasks"][c_step]["nextstep"]
+
+            elif active._type == "condition":
+                result = active.execute(data=data)
+                if result:
+                    c_step = self._pb["tasks"][c_step]["task"]["if_true"]
+                else:
+                    c_step = self._pb["tasks"][c_step]["task"]["if_false"]
 
 
 if __name__ == "__main__":
 
-    t = PlayBook()
-    t.start()
-
+    t = PlayBook(sys.argv[1])
+    t.start(data={"url": "test.com"})

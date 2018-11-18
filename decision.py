@@ -6,13 +6,14 @@ class Decision():
 
         self._id = settings["id"]
         self._name = settings["name"]
+        self._type = "condition"
         self._condition = settings["condition"]
         self._left_operand = settings["left_operand"]
         self._left_operand_dynamic = settings["left_operand_dynamic"]
         self._right_operand = settings["right_operand"]
         self._right_operand_dynamic = settings["right_operand_dynamic"]
-        self._exec_if_true = settings["if_false"]
-        self._exec_if_false = settings["if_true"]
+        self._exec_if_true = settings["if_true"]
+        self._exec_if_false = settings["if_false"]
 
     def _validate_settings(self, settings):
 
@@ -25,7 +26,6 @@ class Decision():
                 raise ValueError("{} not in decision settings".format(req))
 
         return settings
-
 
     def execute(self, data={}):
 
@@ -54,7 +54,5 @@ class Decision():
                 right = "'{}'".format(self._right_operand)
 
         # Run comparison
-        if eval("{} {} {}".format(left, self._condition, right)):
-            self._exec_if_true(data=data)
-        else:
-            self._exec_if_false(data=data)
+        comparison = "{} {} {}".format(left, self._condition, right)
+        return eval(comparison)
