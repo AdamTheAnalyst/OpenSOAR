@@ -48,4 +48,4 @@ class PlayBook():
 if __name__ == "__main__":
 
     t = PlayBook(sys.argv[1])
-    t.start(data={"url": "test.com"})
+    t.start(data={"isbn": "9789000035526"})

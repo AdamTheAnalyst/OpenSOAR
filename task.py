@@ -20,7 +20,6 @@ class Task():
 
     def execute(self, data={}):
         for imp in self._settings["imports"]:
-            print("importing {}".format(imp))
             globals()[imp] = __import__(imp)
 
         exec(self._code)
