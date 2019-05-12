@@ -25,3 +25,22 @@ class Task():
         exec(self._code)
         dummy_func = locals()[self._settings["entry_point"]]
         return dummy_func(data=data, settings=self._settings)
+
+
+
+class DistributedTask():
+
+    def __init__(self, settings={}):
+
+        self._type = "task"
+        self._settings = self._validate_settings(settings)
+
+    def _validate_settings(self, settings):
+
+        required = ["id", "name", "script", "entry_point", "imports", "outputs"]
+
+        for req in required:
+            if req not in settings:
+                raise ValueError("{} not in task settings".format(req))
+
+        return settings
